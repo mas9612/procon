@@ -1,54 +1,47 @@
+#include <algorithm>
 #include <iostream>
-#include <utility>
 #include <vector>
 
 using namespace std;
 
 struct Card {
-    char suit;
-    int value;
+    char c;
+    int n;
 };
 
-void bubble_sort(vector<Card>& cards) {
-    int size = cards.size();
-    for (int i = 0; i < size - 1; ++i) {
-        for (int j = size - 1; j > i; --j) {
-            if (cards[j].value < cards[j - 1].value)
-                swap(cards[j], cards[j - 1]);
+void print_cards(vector<Card> c, int length) {
+    cout << c[0].c << c[0].n;
+    for (int i = 1; i < length; ++i)
+        cout << ' ' << c[i].c << c[i].n;
+    cout << '\n';
+}
+
+void bubble_sort(vector<Card>& c, int length) {
+    for (int i = 0; i < length; ++i) {
+        for (int j = length - 1; j > i; --j) {
+            if (c[j].n < c[j - 1].n)
+                swap(c[j], c[j - 1]);
         }
     }
 }
 
-void selection_sort(vector<Card>& cards) {
-    int size = cards.size();
-    for (int i = 0; i < size - 1; ++i) {
-        int min_card = i;
-        for (int j = i + 1; j < size; ++j) {
-            if (cards[min_card].value > cards[j].value)
-                min_card = j;
+void selection_sort(vector<Card>& c, int length) {
+    for (int i = 0; i < length; ++i) {
+        int min_idx = i;
+        for (int j = i; j < length; ++j) {
+            if (c[j].n < c[min_idx].n)
+                min_idx = j;
         }
-        swap(cards[i], cards[min_card]);
+        swap(c[i], c[min_idx]);
     }
 }
 
-bool is_stable(vector<Card>& c1, vector<Card>& c2) {
-    if (c1.size() != c2.size())
-        return false;
-
-    int size = c1.size();
-    for (int i = 0; i < size; ++i) {
-        if (c1[i].suit != c2[i].suit || c1[i].value != c2[i].value)
+bool is_stable(vector<Card>& stable, vector<Card>& c, int length) {
+    for (int i = 0; i < length; ++i) {
+        if (stable[i].c != c[i].c || stable[i].n != c[i].n)
             return false;
     }
     return true;
-}
-
-void print_cards(vector<Card>& cards) {
-    int size = cards.size();
-    cout << cards[0].suit << cards[0].value;
-    for (int i = 1; i < size; ++i)
-        cout << ' ' << cards[i].suit << cards[i].value;
-    cout << '\n';
 }
 
 int main() {
@@ -56,23 +49,24 @@ int main() {
     cin >> n;
 
     vector<Card> cards(n);
-    for (int i = 0; i < n; ++i) {
-        string s;
-        cin >> s;
-        cards[i].suit = s[0];
-        cards[i].value = s[1] - '0';
-    }
-    vector<Card> cards2(cards);
+    for (int i = 0; i < n; ++i)
+        cin >> cards[i].c >> cards[i].n;
 
-    bubble_sort(cards);
-    selection_sort(cards2);
+    vector<Card> bubble(n);
+    copy(cards.begin(), cards.end(), bubble.begin());
+    bubble_sort(bubble, n);
 
-    print_cards(cards);
+    vector<Card> selection(n);
+    copy(cards.begin(), cards.end(), selection.begin());
+    selection_sort(selection, n);
+
+    print_cards(bubble, n);
     cout << "Stable\n";
 
-    print_cards(cards2);
-    if (is_stable(cards, cards2))
+    print_cards(selection, n);
+    if (is_stable(bubble, selection, n))
         cout << "Stable\n";
     else
         cout << "Not stable\n";
 }
+

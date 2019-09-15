@@ -1,12 +1,13 @@
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
 using namespace std;
 
-int insertion_sort(vector<int>& v, int step) {
-    int size = v.size();
+int insertion_sort(vector<int>& v, int length, int step) {
     int count = 0;
-    for (int i = step; i < size; ++i) {
+
+    for (int i = step; i < length; ++i) {
         int tmp = v[i];
         int j = i - step;
         while (j >= 0 && v[j] > tmp) {
@@ -16,23 +17,32 @@ int insertion_sort(vector<int>& v, int step) {
         }
         v[j + step] = tmp;
     }
+
     return count;
 }
 
-int shell_sort(vector<int>& v, vector<int> h) {
-    int h_size = h.size();
+int shell_sort(vector<int>& v, int length, vector<int>& g, int m) {
     int count = 0;
-    for (int i = h_size - 1; i >= 0; --i)
-        count += insertion_sort(v, h[i]);
+
+    for (int i = 0; i < m; ++i)
+        count += insertion_sort(v, length, g[i]);
+
     return count;
 }
 
-void print_vector(vector<int>& v) {
-    int size = v.size();
-    cout << v[size - 1];
-    for (int i = size - 2; i >= 0; --i)
-        cout << ' ' << v[i];
-    cout << '\n';
+void make_step(vector<int>& g, int target_len) {
+    g.clear();
+
+    int h = 1;
+    while (true) {
+        if (h > target_len)
+            break;
+
+        g.push_back(h);
+        h = 3 * h + 1;
+    }
+
+    reverse(g.begin(), g.end());
 }
 
 int main() {
@@ -43,23 +53,19 @@ int main() {
     for (int i = 0; i < n; ++i)
         cin >> v[i];
 
-    vector<int> h;
-    h.push_back(1);
-    for (int i = 0;; ++i) {
-        int tmp = 3 * h[i] + 1;
-        if (tmp < n)
-            h.push_back(tmp);
-        else
-            break;
-    }
+    vector<int> g;
+    make_step(g, n);
+    int count = shell_sort(v, n, g, g.size());
 
-    int count = shell_sort(v, h);
+    cout << g.size() << '\n';
+    cout << g[0];
+    for (int i = 1; i < g.size(); ++i)
+        cout << ' ' << g[i];
+    cout << '\n';
 
-    int h_size = h.size();
-    cout << h_size << '\n';
-    print_vector(h);
     cout << count << '\n';
 
     for (int i = 0; i < n; ++i)
         cout << v[i] << '\n';
 }
+

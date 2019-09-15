@@ -4,31 +4,22 @@
 
 using namespace std;
 
-void print_vector(vector<int> v) {
-    int size = v.size();
-    cout << v[0];
-    for (int i = 1; i < size; ++i)
-        cout << ' ' << v[i];
-    cout << '\n';
-}
+int selection_sort(vector<int>& v, int length) {
+    int count = 0;
 
-int selection_sort(vector<int>& v) {
-    int swap_count = 0;
-    int size = v.size();
-
-    for (int i = 0; i < size - 1; ++i) {
-        int min_index = i;
-        for (int j = i; j < size; ++j) {
-            if (v[j] < v[min_index])
-                min_index = j;
+    for (int i = 0; i < length; ++i) {
+        int min_idx = i;
+        for (int j = i; j < length; ++j) {
+            if (v[min_idx] > v[j])
+                min_idx = j;
         }
-        if (i != min_index) {
-            swap(v[i], v[min_index]);
-            ++swap_count;
+        if (i != min_idx) {
+            swap(v[i], v[min_idx]);
+            ++count;
         }
     }
 
-    return swap_count;
+    return count;
 }
 
 int main() {
@@ -39,7 +30,13 @@ int main() {
     for (int i = 0; i < n; ++i)
         cin >> v[i];
 
-    int count = selection_sort(v);
-    print_vector(v);
+    int count = selection_sort(v, n);
+
+    cout << v[0];
+    for (int i = 1; i < n; ++i)
+        cout << ' ' << v[i];
+    cout << '\n';
+
     cout << count << '\n';
 }
+
