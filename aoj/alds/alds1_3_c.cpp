@@ -3,130 +3,106 @@
 
 using namespace std;
 
-class Node {
-   public:
+struct Node {
+    int value;
     Node* next;
     Node* prev;
-    long long value;
-
-    Node() : next(NULL), prev(NULL), value(0) {}
 };
 
-void delete_first(Node** head, Node** last) {
-    Node* tmp = *head;
-    *head = tmp->next;
-    delete tmp;
-
-    if (*head != NULL) {
-        (*head)->prev = NULL;
-        if (*head == *last)
-            (*last)->prev = NULL;
-    } else  // list is empty
-        *last = NULL;
+Node* init_list() {
+    Node* node = new Node;
+    node->next = node;
+    node->prev = node;
+    return node;
 }
 
-void delete_last(Node** head, Node** last) {
-    Node* node = *last;
-    if (node != NULL) {
-        *last = node->prev;
-        if (*last != NULL) {
-            (*last)->next = NULL;
-        } else {
-            *head = NULL;
-        }
-        delete node;
-    }
-}
-
-void insert_node(Node** head, Node** last, long long value) {
+void insert_node(Node* head, int value) {
     Node* new_node = new Node;
     new_node->value = value;
 
-    if (*head == NULL) {
-        *head = new_node;
-        *last = new_node;
-    } else {
-        new_node->next = *head;
-        (*head)->prev = new_node;
-        *head = new_node;
-    }
+    Node* node = head->next;
+    head->next = new_node;
+    new_node->prev = head;
+    new_node->next = node;
+    node->prev = new_node;
 }
 
-void delete_node(Node** head, Node** last, long long value) {
-    Node* node = *head;
-    while (node != NULL) {
+void delete_node(Node* head, int value) {
+    Node* node = head->next;
+    while (node != head) {
         if (node->value == value)
             break;
         node = node->next;
     }
 
-    if (node != NULL) {
-        if (node->prev == NULL && node->next != NULL) {
-            // I don't need to delete node here since delete_first does
-            delete_first(head, last);
-        } else if (node->next == NULL && node->prev != NULL) {
-            // I don't need to delete node here since delete_last does
-            delete_last(head, last);
-        } else {
-            if (node->prev == NULL && node->next == NULL) {
-                *head = NULL;
-                *last = NULL;
-            } else {
-                node->prev->next = node->next;
-                node->next->prev = node->prev;
-            }
-            delete node;
-        }
+    if (node != head) {
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
     }
 }
 
-void print_list(Node* head) {
-    Node* node = head;
-    if (node != NULL) {
-        cout << node->value;
-        node = node->next;
+void delete_first(Node* head) {
+    Node* node = head->next;
+    if (node != head) {
+        head->next = node->next;
+        node->next->prev = head;
+        delete node;
     }
-    while (node != NULL) {
-        cout << ' ' << node->value;
-        node = node->next;
+}
+
+void delete_last(Node* head) {
+    Node* node = head->prev;
+    if (node != head) {
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+        delete node;
     }
-    cout << '\n';
 }
 
 int main() {
     ios::sync_with_stdio(false);
+    cin.tie(0);
 
     int n;
     cin >> n;
 
-    Node* head = NULL;
-    Node* last = NULL;
+    Node* head = init_list();
 
     for (int i = 0; i < n; ++i) {
-        string op;
-        cin >> op;
-        long long value;
+        string cmd;
+        cin >> cmd;
 
-        if (op == "insert") {
+        int value;
+        if (cmd == "insert") {
             cin >> value;
-            insert_node(&head, &last, value);
-        } else if (op == "delete") {
+            insert_node(head, value);
+        } else if (cmd == "delete") {
             cin >> value;
-            delete_node(&head, &last, value);
-        } else if (op == "deleteFirst") {
-            delete_first(&head, &last);
+            delete_node(head, value);
+        } else if (cmd == "deleteFirst") {
+            delete_first(head);
         } else {
-            delete_last(&head, &last);
+            delete_last(head);
         }
     }
 
-    print_list(head);
-
-    Node* prev;
-    while (head != NULL) {
-        prev = head;
-        head = head->next;
-        delete prev;
+    Node* node = head->next;
+    if (node != head)
+        cout << node->value;
+    node = node->next;
+    while (node != head) {
+        cout << ' ' << node->value;
+        node = node->next;
     }
+    cout << '\n';
+
+    Node* tmp;
+    node = head->next;
+    while (node != head) {
+        tmp = node;
+        node = node->next;
+        delete tmp;
+    }
+    delete head;
 }
 
