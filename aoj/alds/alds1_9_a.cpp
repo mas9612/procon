@@ -1,34 +1,28 @@
 #include <iostream>
 #include <vector>
-#include <string>
 
 using namespace std;
 
-void print(string position, int index, vector<int>& H, int size)
-{
-    if (index > 0 && index <= size)
-        cout << position << " key = " << H[index] << ", ";
-}
+int main() {
+    int h;
+    cin >> h;
 
-int main()
-{
-    int size;
-    cin >> size;
+    vector<int> heap(h + 1);
+    for (int i = 1; i <= h; ++i)
+        cin >> heap[i];
 
-    vector<int> H(size+1);
-    for (int i = 1; i <= size; ++i)
-        cin >> H[i];
+    for (int i = 1; i <= h; ++i) {
+        cout << "node " << i << ": key = " << heap[i];
+        if (i > 1)
+            cout << ", parent key = " << heap[i / 2];
 
-    for (int i = 1; i <= size; ++i) {
-        int parent = i / 2;
-        int left = i * 2;
-        int right = i * 2 + 1;
-
-        cout << "node " << i << ": key = " << H[i] << ", ";
-        print("parent", parent, H, size);
-        print("left", left, H, size);
-        print("right", right, H, size);
-        cout << '\n';
+        int left_idx = i * 2;
+        int right_idx = i * 2 + 1;
+        if (left_idx <= h)
+            cout << ", left key = " << heap[left_idx];
+        if (right_idx <= h)
+            cout << ", right key = " << heap[right_idx];
+        cout << ", \n";
     }
 }
 

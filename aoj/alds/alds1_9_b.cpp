@@ -4,42 +4,43 @@
 
 using namespace std;
 
-void max_heapify(vector<int>& H, int i, int size)
-{
-    int left = i * 2;
-    int right = i * 2 + 1;
+int left(int i) { return i * 2; }
 
-    int max = i;
-    if (left <= size && H[max] < H[left])
-        max = left;
-    if (right <= size && H[max] < H[right])
-        max = right;
+int right(int i) { return i * 2 + 1; }
 
-    if (max != i) {
-        swap(H[max], H[i]);
-        max_heapify(H, max, size);
+void max_heapify(vector<int>& heap, int index) {
+    int left_idx = left(index);
+    int right_idx = right(index);
+
+    int max_idx = index;
+    if (left_idx < heap.size() && heap[max_idx] < heap[left_idx])
+        max_idx = left_idx;
+    if (right_idx < heap.size() && heap[max_idx] < heap[right_idx])
+        max_idx = right_idx;
+
+    if (max_idx != index) {
+        swap(heap[index], heap[max_idx]);
+        max_heapify(heap, max_idx);
     }
 }
 
-void build_max_heap(vector<int>& H, int size)
-{
-    for (int i = size / 2; i > 0; --i)
-        max_heapify(H, i, size);
+void build_heap(vector<int>& heap) {
+    for (int i = (heap.size() - 1) / 2; i > 0; --i)
+        max_heapify(heap, i);
 }
 
-int main()
-{
-    int size;
-    cin >> size;
+int main() {
+    int n;
+    cin >> n;
 
-    vector<int> H(size+1);
-    for (int i = 1; i <= size; ++i)
-        cin >> H[i];
+    vector<int> heap(n + 1);
+    for (int i = 1; i <= n; ++i)
+        cin >> heap[i];
 
-    build_max_heap(H, size);
+    build_heap(heap);
 
-    for (int i = 1; i <= size; ++i)
-        cout << ' ' << H[i];
+    for (int i = 1; i <= n; ++i)
+        cout << ' ' << heap[i];
     cout << '\n';
 }
 

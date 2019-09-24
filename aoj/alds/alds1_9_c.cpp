@@ -1,80 +1,73 @@
 #include <iostream>
 #include <string>
-#include <utility>
 #include <vector>
 
 using namespace std;
 
-void max_heapify(vector<int>& H, int i, int size)
-{
-    int left = i * 2;
-    int right = i * 2 + 1;
+struct Heap {
+    vector<long> heap;
+    long size;
+    long last_idx;
 
-    int max = i;
-    if (left <= size && H[max] < H[left])
-        max = left;
-    if (right <= size && H[max] < H[right])
-        max = right;
+    Heap(long n) : size(n), last_idx(0) { heap.reserve(n); }
+    long parent(long i) { return i / 2; }
+    long left(long i) { return i * 2; }
+    long right(long i) { return i * 2 + 1; }
 
-    if (max != i) {
-        swap(H[max], H[i]);
-        max_heapify(H, max, size);
+    void max_heapify(long index) {
+        long left_idx = left(index);
+        long right_idx = right(index);
+
+        long max_idx = index;
+        if (left_idx <= last_idx && heap[max_idx] < heap[left_idx])
+            max_idx = left_idx;
+        if (right_idx <= last_idx && heap[max_idx] < heap[right_idx])
+            max_idx = right_idx;
+
+        if (max_idx != index) {
+            swap(heap[index], heap[max_idx]);
+            max_heapify(max_idx);
+        }
     }
-}
 
-void build_max_heap(vector<int>& H, int size)
-{
-    for (int i = size / 2; i > 0; --i)
-        max_heapify(H, i, size);
-}
+    void insert(long key) {
+        ++last_idx;
+        heap[last_idx] = key;
 
-void insert(vector<int>& S, int key, int& last)
-{
-    ++last;
-    S[last] = key;
-
-    int child = last;
-    int parent = child / 2;
-    while (parent > 0 && child > 0 && S[parent] < S[child]) {
-        swap(S[parent], S[child]);
-        child = parent;
-        parent = child / 2;
+        long index = last_idx;
+        // don't need to heapify when add the first key
+        while (index > 1 && heap[parent(index)] < heap[index]) {
+            swap(heap[parent(index)], heap[index]);
+            index = parent(index);
+        }
     }
-}
 
-int extract_max(vector<int>& S, int& last)
-{
-    if (last < 1)   // priority queue is empty
-        return -1;
+    long extract_max() {
+        long ret = heap[1];
+        heap[1] = heap[last_idx];
+        --last_idx;
+        max_heapify(1);
+        return ret;
+    }
+};
 
-    int max = S[1]; // first elem is max value
+int main() {
+    ios::sync_with_stdio(false);
 
-    S[1] = S[last];
-    --last;
-    max_heapify(S, 1, last);
+    const long inst_max = 2000000;
+    Heap heap(inst_max + 1);
 
-    return max;
-}
-
-int main()
-{
-    const int max_instruction = 2000000;
-    vector<int> S(max_instruction + 1);
-    int last = 0;
-
+    string inst;
     while (true) {
-        string instruction;
-        cin >> instruction;
-
-        if (instruction == "end") {
+        cin >> inst;
+        if (inst == "end") {
             break;
-        } else if (instruction == "extract") {
-            int max = extract_max(S, last);
-            cout << max << '\n';
+        } else if (inst == "insert") {
+            long key;
+            cin >> key;
+            heap.insert(key);
         } else {
-            int k;
-            cin >> k;
-            insert(S, k, last);
+            cout << heap.extract_max() << '\n';
         }
     }
 }
