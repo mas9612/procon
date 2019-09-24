@@ -5,44 +5,31 @@
 
 using namespace std;
 
-int results[1001][1001];
+int lcs(string s1, string s2) {
+    s1 = ' ' + s1;
+    s2 = ' ' + s2;
+    vector<vector<int>> v(s1.length(), vector<int>(s2.length(), 0));
 
-int lcs(string x, string y)
-{
-    // initialize
-    for (int i = 0; i < 1001; ++i) {
-        for (int j = 0; j < 1001; ++j)
-            results[i][j] = 0;
-    }
-
-    int maxlcs = 0;
-    // start from 1 for results array
-    for (int i = 1; i <= x.length(); ++i) {
-        for (int j = 1; j <= y.length(); ++j) {
-            // sub 1 to access to nth character (because results array is considered as 1 origin but string is 0 origin)
-            if (x[i-1] == y[j-1])
-                results[i][j] = results[i-1][j-1] + 1;
+    for (int i = 1; i < s1.length(); ++i) {
+        for (int j = 1; j < s2.length(); ++j) {
+            if (s1[i] == s2[j])
+                v[i][j] = v[i - 1][j - 1] + 1;
             else
-                results[i][j] = max(results[i-1][j], results[i][j-1]);
-
-            if (maxlcs < results[i][j])
-                maxlcs = results[i][j];
+                v[i][j] = max(v[i - 1][j], v[i][j - 1]);
         }
     }
-    return maxlcs;
+
+    return v[s1.length() - 1][s2.length() - 1];
 }
 
-int main()
-{
+int main() {
     int n;
     cin >> n;
 
-    vector<string> x(n);
-    vector<string> y(n);
-    for (int i = 0; i < n; ++i)
-        cin >> x[i] >> y[i];
-
-    for (int i = 0; i < n; ++i)
-        cout << lcs(x[i], y[i]) << '\n';
+    string s1, s2;
+    for (int i = 0; i < n; ++i) {
+        cin >> s1 >> s2;
+        cout << lcs(s1, s2) << '\n';
+    }
 }
 
