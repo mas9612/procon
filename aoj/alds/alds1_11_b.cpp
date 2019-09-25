@@ -3,50 +3,53 @@
 
 using namespace std;
 
-int current = 0;
-vector<int> d(100, 0);
-vector<int> f(100, 0);
-vector<bool> visited(100, false);
+struct vertex {
+    bool visited;
+    int d;
+    int f;
 
-void dfs(vector<vector<int>>& G, int vid)
-{
-    if (!visited[vid]) {
-        ++current;
-        d[vid] = current;
-        visited[vid] = true;
+    vertex() : visited(false), d(0), f(0) {}
+};
 
-        int size = G[vid].size();
-        for (int i = 0; i < size && G[vid][i] > -1; ++i)
-            dfs(G, G[vid][i]);
+int current_time = 1;
 
-        ++current;
-        f[vid] = current;
-    }
+void dfs(vector<vector<int>>& g, vector<vertex>& info, int index) {
+    if (info[index].visited)
+        return;
+
+    info[index].d = current_time;
+    info[index].visited = true;
+    ++current_time;
+
+    for (int i = 0; i < g[index].size(); ++i)
+        dfs(g, info, g[index][i]);
+    info[index].f = current_time;
+    ++current_time;
 }
 
-int main()
-{
+int main() {
     int n;
     cin >> n;
 
-    // adjacency list (-1 means the end of adjacencies)
-    vector<vector<int>> G(n, vector<int>(n, -1));
+    vector<vector<int>> g(n + 1);
     for (int i = 0; i < n; ++i) {
-        int v, nv;
-        cin >> v >> nv;
-        --v;
-        for (int j = 0; j < nv; ++j) {
-            int tmp;
-            cin >> tmp;
-            --tmp;
-            G[v][j] = tmp;
+        int u, k;
+        cin >> u >> k;
+
+        for (int j = 0; j < k; ++j) {
+            int v;
+            cin >> v;
+            g[u].push_back(v);
         }
     }
 
-    for (int i = 0; i < n; ++i)
-        dfs(G, i);
+    vector<vertex> result_info(n + 1);
+    for (int i = 1; i <= n; ++i) {
+        if (!result_info[i].visited)
+            dfs(g, result_info, i);
+    }
 
-    for (int i = 0; i < n; ++i)
-        cout << i+1 << ' ' << d[i] << ' ' << f[i] << '\n';
+    for (int i = 1; i <= n; ++i)
+        cout << i << ' ' << result_info[i].d << ' ' << result_info[i].f << '\n';
 }
 
