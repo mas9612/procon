@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <climits>
 #include <iostream>
 #include <vector>
 
@@ -9,32 +8,20 @@ int main() {
     int n;
     cin >> n;
 
-    const int INF = INT_MAX;
-    vector<vector<int>> happiness(n, vector<int>(3, INF));
+    vector<vector<int>> happy(3, vector<int>(n + 1));
+    for (int i = 1; i <= n; ++i)
+        cin >> happy[0][i] >> happy[1][i] >> happy[2][i];
 
-    const int SEA = 0;
-    const int MOUNTAIN = 1;
-    const int HOME = 2;
-    for (int i = 0; i < n; ++i) {
-        int a, b, c;
-        cin >> a >> b >> c;
-
-        if (i == 0) {
-            happiness[i][SEA] = a;
-            happiness[i][MOUNTAIN] = b;
-            happiness[i][HOME] = c;
-        } else {
-            happiness[i][SEA] =
-                max(happiness[i - 1][MOUNTAIN] + a, happiness[i - 1][HOME] + a);
-            happiness[i][MOUNTAIN] =
-                max(happiness[i - 1][SEA] + b, happiness[i - 1][HOME] + b);
-            happiness[i][HOME] =
-                max(happiness[i - 1][SEA] + c, happiness[i - 1][MOUNTAIN] + c);
-        }
+    vector<vector<int>> dp(3, vector<int>(n + 1, 0));
+    for (int i = 1; i <= n; ++i) {
+        dp[0][i] = max(dp[1][i - 1] + happy[0][i], dp[2][i - 1] + happy[0][i]);
+        dp[1][i] = max(dp[2][i - 1] + happy[1][i], dp[0][i - 1] + happy[1][i]);
+        dp[2][i] = max(dp[0][i - 1] + happy[2][i], dp[1][i - 1] + happy[2][i]);
     }
 
-    int max_happiness = happiness[n - 1][SEA];
-    max_happiness = max(max_happiness, happiness[n - 1][MOUNTAIN]);
-    max_happiness = max(max_happiness, happiness[n - 1][HOME]);
-    cout << max_happiness << '\n';
+    int max_val = dp[0][n];
+    for (int i = 1; i < 3; ++i)
+        max_val = max(max_val, dp[i][n]);
+    cout << max_val << '\n';
 }
+
